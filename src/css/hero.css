@@ -83,3 +83,21 @@
   0%,100% { transform:scaleY(1); opacity:0.6; }
   50% { transform:scaleY(0.5); opacity:1; }
 }
+
+/* ─── Telas desktop com altura reduzida ───── */
+@media (max-height: 750px) and (min-width: 769px) {
+  .hero__content { padding-top: var(--space-12); }
+  .hero__ornament { margin-bottom: var(--space-2); }
+  .hero__label { margin-bottom: var(--space-2); }
+  .hero__title { font-size: clamp(2.8rem, 8vw, 5rem); margin-bottom: var(--space-4); }
+  .hero__meta { margin-bottom: var(--space-6); }
+}
+
+@media (max-height: 600px) and (min-width: 769px) {
+  .hero__content { padding-top: var(--space-8); }
+  .hero__ornament { display: none; }
+  .hero__label { margin-bottom: var(--space-1); }
+  .hero__title { font-size: clamp(2.2rem, 6vw, 3.8rem); margin-bottom: var(--space-2); }
+  .hero__meta { margin-bottom: var(--space-4); }
+  .hero__scroll-indicator { display: none; }
+}
