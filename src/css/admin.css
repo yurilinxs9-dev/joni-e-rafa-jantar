@@ -459,6 +459,43 @@ td:last-child  { padding-right: 1.5rem; text-align: right; }
 
 .admin-footer__text em { color: var(--gold); font-style: normal; }
 
+/* ─── BOTÃO EXCLUIR ──────────────────────── */
+.td-actions {
+  text-align: right;
+  padding-right: 1.5rem;
+}
+
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  color: var(--text-3);
+  transition: color 200ms, border-color 200ms, background 200ms;
+  opacity: 0;
+}
+
+tbody tr:hover .btn-delete { opacity: 1; }
+
+.btn-delete:hover {
+  color: var(--red);
+  border-color: rgba(201,96,76,0.35);
+  background: rgba(201,96,76,0.07);
+}
+
+.btn-delete svg {
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.btn-delete.deleting {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ─── RESPONSIVE ─────────────────────────── */
 @media (max-width: 900px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }

@@ -26,6 +26,21 @@ function fmtCurrency(v) {
   return 'R$ ' + Number(v || 0).toFixed(2).replace('.', ',');
 }
 
+/* ─── Supabase delete ────────────────────── */
+async function deleteConfirmacao(id) {
+  const res = await fetch(
+    `${CONFIG.supabaseUrl}/rest/v1/${CONFIG.table}?id=eq.${id}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'apikey':        CONFIG.serviceRoleKey,
+        'Authorization': `Bearer ${CONFIG.serviceRoleKey}`,
+      }
+    }
+  );
+  if (!res.ok) throw new Error(`Erro ${res.status}: ${await res.text()}`);
+}
+
 /* ─── Supabase fetch ─────────────────────── */
 async function fetchConfirmacoes() {
   const res = await fetch(
@@ -73,7 +88,7 @@ function renderTable(rows) {
   if (!rows.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6">
+        <td colspan="7">
           <div class="empty-state">
             <div class="empty-state__icon">◇</div>
             <div class="empty-state__text">Nenhuma confirmação encontrada</div>
@@ -85,6 +100,7 @@ function renderTable(rows) {
 
   rows.forEach((r, i) => {
     const tr = document.createElement('tr');
+    tr.dataset.id = r.id;
     tr.innerHTML = `
       <td>${i + 1}</td>
       <td>${escHtml(r.nome || '—')}</td>
@@ -92,8 +108,37 @@ function renderTable(rows) {
       <td><span class="badge badge--guests">${r.convidados || 1} pessoa${r.convidados > 1 ? 's' : ''}</span></td>
       <td><span class="badge badge--value">${fmtCurrency(r.valor_total)}</span></td>
       <td class="td-date">${fmtDate(r.created_at)}</td>
+      <td class="td-actions">
+        <button class="btn-delete" data-id="${r.id}" data-nome="${escHtml(r.nome || 'este convidado')}" title="Excluir">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 5h14M8 5V3h4v2M6 5l1 12h6l1-12"/>
+          </svg>
+        </button>
+      </td>
     `;
     tbody.appendChild(tr);
+  });
+
+  // Delegação de eventos nos botões de excluir
+  tbody.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id   = btn.dataset.id;
+      const nome = btn.dataset.nome;
+      if (!confirm(`Excluir ${nome}?\n\nEsta ação não pode ser desfeita.`)) return;
+
+      btn.disabled = true;
+      btn.classList.add('deleting');
+      try {
+        await deleteConfirmacao(id);
+        allRows = allRows.filter(r => String(r.id) !== String(id));
+        renderStats(allRows);
+        renderTable(allRows);
+      } catch (err) {
+        alert('Erro ao excluir: ' + err.message);
+        btn.disabled = false;
+        btn.classList.remove('deleting');
+      }
+    });
   });
 }
 
@@ -118,7 +163,7 @@ function filterRows(query) {
 /* ─── Load data ──────────────────────────── */
 async function loadData() {
   const tbody = document.getElementById('tbody-main');
-  tbody.innerHTML = `<tr class="loading-row"><td colspan="6"><div class="spinner"></div></td></tr>`;
+  tbody.innerHTML = `<tr class="loading-row"><td colspan="7"><div class="spinner"></div></td></tr>`;
 
   try {
     allRows = await fetchConfirmacoes();
@@ -129,7 +174,7 @@ async function loadData() {
     if (lastUpdate) lastUpdate.textContent = fmtDate(new Date().toISOString());
   } catch (err) {
     tbody.innerHTML = `
-      <tr><td colspan="6">
+      <tr><td colspan="7">
         <div class="empty-state">
           <div class="empty-state__icon">⚠</div>
           <div class="empty-state__text">Erro ao carregar: ${escHtml(err.message)}</div>
