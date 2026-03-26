@@ -2,22 +2,31 @@
    FRAMES.CSS — GTA-style scrubbing
    ════════════════════════════════════════════ */
 
+/*
+  IMPORTANTE: .frames-section NÃO deve ter overflow:hidden nem contain:layout.
+  O GSAP ScrollTrigger insere um spacer div como filho desta seção para reservar
+  o espaço de scroll (2400px). Qualquer BFC ou layout containment neste wrapper
+  interfere na medição de posições do GSAP e causa o pulo no release do pin.
+*/
 .frames-section {
   width: 100%;
-  overflow: hidden;   /* impede que o spacer GSAP cause reflow no layout externo */
 }
 
 .frames-sticky {
   position: relative;
   width: 100%;
   height: 100vh;
-  overflow: hidden;
+  overflow: hidden;   /* overflow:hidden aqui (no elemento filho) é seguro */
   background: #000;
-  contain: layout paint; /* isola rendering — camada GPU própria, sem afetar o resto */
+  /*
+    SEM contain:layout — o GSAP precisa medir a posição deste elemento
+    no contexto do documento inteiro para calcular o spacer corretamente.
+    contain:layout cria contexto isolado e quebra essa medição.
+  */
 }
 
 /* Fundo: definido UMA VEZ no init — nunca atualizado durante scroll.
-   Evita que o browser redecodifique + recomponha blur a cada troca de frame. */
+   Evita redecodificar + recompor blur/brightness a cada troca de frame. */
 .frame-bg {
   position: absolute;
   inset: 0;
@@ -43,11 +52,10 @@
   display: block;
   user-select: none;
   pointer-events: none;
-  will-change: contents; /* avisa ao browser que o src vai trocar */
+  will-change: contents;
 }
 
-/* Overlay de fade: cobre a seção suavemente no final da sequência
-   em vez de cortar seco para o preto */
+/* Overlay de fade: cobre a seção suavemente no final da sequência */
 .frames-fade-out {
   position: absolute;
   inset: 0;

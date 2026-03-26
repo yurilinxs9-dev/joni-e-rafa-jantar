@@ -520,11 +520,27 @@ document.addEventListener('DOMContentLoaded', () => {
         end: '+=2400',
         scrub: 1,
         pinSpacing: true,
-        anticipatePin: 1,          // prepara o pin um frame antes — elimina o "pulo" inicial
+        /*
+          anticipatePin removido: com scrub:1 o scroll já é suave e não
+          precisa de antecipação. anticipatePin introduz um offset temporal
+          que, combinado com o delay do scrub, causava o pulo no release.
+
+          invalidateOnRefresh: true garante que resize/orientação
+          recalcula tudo sem precisar de anticipatePin.
+        */
         invalidateOnRefresh: true,
       },
     });
   }
+
+  /*
+    ScrollTrigger.refresh() no window 'load':
+    GSAP mede posições no DOMContentLoaded, mas imagens (hero, galeria, frames)
+    carregam depois e empurram conteúdo para baixo. Sem o refresh, o spacer do
+    pin fica com altura errada → pulo ao liberar o pin.
+    Este refresh recalcula todos os triggers após todos os assets estarem prontos.
+  */
+  window.addEventListener('load', () => ScrollTrigger.refresh());
 
 });
 
