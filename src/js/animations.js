@@ -469,17 +469,18 @@ document.addEventListener('DOMContentLoaded', () => {
       `assets/frames/frame_${String(i + 1).padStart(2, '0')}.png`
     );
 
-    // Pré-carrega todos: sem flicker ao trocar
+    // Pré-carrega E decodifica antecipadamente: elimina jank na primeira exibição
     const cache = frameSrcs.map(src => {
       const img = new Image();
       img.src = src;
       return img;
     });
+    cache.forEach(img => { if (img.decode) img.decode().catch(() => {}); });
 
-    let current = 0;
+    let current = -1; // -1 garante que frame 0 sempre renderiza na primeira chamada
 
     function showFrame(index) {
-      const i = Math.min(Math.max(Math.round(index), 0), TOTAL - 1);
+      const i = Math.min(Math.max(Math.floor(index), 0), TOTAL - 1);
       if (i === current) return;
       current = i;
       frameDisplay.src = cache[i].src;
@@ -498,11 +499,12 @@ document.addEventListener('DOMContentLoaded', () => {
       onUpdate: () => showFrame(proxy.f),
       scrollTrigger: {
         trigger: frameSticky,
-        pin: true,           // GSAP faz o pin — sem area preta residual
+        pin: true,
         start: 'top top',
-        end: '+=1200',       // 1200px de scroll = ~16 frames confortáveis
-        scrub: 0.3,
-        pinSpacing: true,    // adiciona espaço automático abaixo (empurra o footer)
+        end: '+=2400',            // ~150px por frame — transição confortável, sem rush
+        scrub: 1,                 // catch-up suave, sem gaps em scroll rápido
+        pinSpacing: true,
+        invalidateOnRefresh: true, // recalcula ao redimensionar/mudar orientação
       },
     });
   }
