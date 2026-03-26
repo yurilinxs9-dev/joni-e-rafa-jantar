@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════
    ANIMATIONS.JS — GSAP Premium
-   Jantar Pré-Casamento · Versão 2.0
+   Jantar Pós-Casamento · Versão 2.0
    ══════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {

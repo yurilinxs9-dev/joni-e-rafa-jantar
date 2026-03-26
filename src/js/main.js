@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════
-   MAIN.JS — Jantar Pré-Casamento
+   MAIN.JS — Jantar Pós-Casamento
    Cursor (duas alianças), Header, utilitários
    ══════════════════════════════════════════ */
 

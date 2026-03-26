@@ -1,6 +1,6 @@
 /* ════════════════════════════════════════════
    ADMIN.JS — Painel de Confirmações
-   Jantar Pré-Casamento
+   Jantar Pós-Casamento
    ════════════════════════════════════════════ */
 
 const CONFIG = {
