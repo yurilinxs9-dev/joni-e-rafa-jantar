@@ -1,0 +1,189 @@
+/* ═══════════════════════════════════════════
+   GALLERY — Destaque + Hover Expand
+   ═══════════════════════════════════════════ */
+
+.gallery-section {
+  padding: var(--space-40) 0;
+  overflow: hidden;
+}
+
+/* Hint sutil abaixo do título */
+.gallery-hint {
+  font-size: var(--text-label);
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  opacity: 0.5;
+  margin-top: calc(var(--space-4) * -1);
+}
+
+/* Container principal */
+.gallery-container {
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 480px;
+}
+
+/* ── IMAGEM DESTAQUE ── */
+.gallery-main {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  cursor: pointer;
+  /* Estado inicial (visível) — GSAP irá mover */
+  opacity: 0; /* GSAP anima no scroll */
+}
+
+/* Borda dourada decorativa (frame) */
+.gallery-main__frame {
+  position: absolute;
+  inset: -8px;
+  border: 1px solid var(--gold-border);
+  pointer-events: none;
+  transition: border-color 400ms, inset 400ms var(--ease-out);
+}
+.gallery-main:hover .gallery-main__frame {
+  inset: -12px;
+  border-color: var(--gold);
+}
+
+.gallery-main__img {
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  object-fit: contain;
+  display: block;
+  background: #0f0e0b;
+  filter: brightness(0.92) saturate(0.95);
+  transition: filter 500ms, transform 500ms var(--ease-out);
+  will-change: transform;
+}
+
+/* Hover na imagem principal: escurece levemente */
+.gallery-main:hover .gallery-main__img {
+  filter: brightness(0.75) saturate(0.8);
+}
+
+/* Overlay "Ver galeria" */
+.gallery-main__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 400ms;
+  pointer-events: none;
+}
+.gallery-main:hover .gallery-main__overlay { opacity: 1; }
+
+.gallery-main__hint {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold-border);
+  padding: var(--space-2) var(--space-6);
+  background: rgba(9,9,9,0.6);
+  backdrop-filter: blur(4px);
+}
+
+/* ── GALLERY GRID (hidden por padrão) ── */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: var(--space-6);
+  /* Estado inicial: invisível e colapsado */
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: height 0s; /* altura controlada pelo GSAP */
+}
+
+.gallery-grid.is-open {
+  height: auto;
+  pointer-events: auto;
+}
+
+.gallery-item {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #0f0e0b;
+  border: 1px solid rgba(201,168,76,0.15);
+  cursor: pointer;
+  /* estado inicial para GSAP */
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transition: border-color 300ms;
+}
+.gallery-item:hover { border-color: var(--gold); }
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #0f0e0b;
+  display: block;
+  filter: brightness(0.9);
+  transition: transform 500ms var(--ease-out), filter 500ms;
+  will-change: transform;
+}
+.gallery-item:hover img {
+  transform: scale(1.06);
+  filter: brightness(1);
+}
+
+/* ── LIGHTBOX SIMPLES ── */
+.gallery-lightbox {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(5,5,5,0.95);
+  backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 300ms;
+}
+.gallery-lightbox.is-open { opacity: 1; pointer-events: all; }
+.gallery-lightbox__img {
+  max-width: 90vw; max-height: 90vh;
+  object-fit: contain;
+}
+.gallery-lightbox__close {
+  position: absolute; top: 2rem; right: 2rem;
+  width: 40px; height: 40px;
+  border: 1px solid var(--gold-border); color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; cursor: pointer;
+  transition: background 300ms, color 300ms;
+}
+.gallery-lightbox__close:hover { background: var(--gold); color: var(--black); }
+
+/* ── RESPONSIVE ── */
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .gallery-container { max-width: 100%; }
+  .gallery-main { max-width: 100%; cursor: default; }
+  .gallery-main__img { max-height: 340px; }
+
+  /* Grid sempre aberto em mobile — GSAP anima, não CSS */
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    height: auto;         /* visível no mobile */
+    overflow: visible;
+    pointer-events: auto;
+    margin-top: var(--space-4);
+  }
+
+  /* Overlay e hint não fazem sentido em touch */
+  .gallery-main__overlay { display: none; }
+  .gallery-hint { display: none; }
+}
+
+@media (max-width: 480px) {
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 3px; }
+  .gallery-main__img { max-height: 280px; }
+}

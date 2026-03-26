@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin · Jantar Pré-Casamento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="src/css/admin.css">
+</head>
+<body>
+
+  <!-- ═══ LOGIN GATE ═══ -->
+  <div id="login-gate">
+    <div class="login-card">
+      <p class="login-ornament">✦ ✦ ✦</p>
+
+      <h1 class="login-title">Painel <em>Admin</em></h1>
+      <p class="login-subtitle">Jantar Pré-Casamento</p>
+      <div class="login-divider"></div>
+
+      <form id="login-form" autocomplete="off">
+        <div class="login-field">
+          <input
+            id="login-password"
+            type="password"
+            placeholder="Senha de acesso"
+            autocomplete="current-password"
+            required
+          >
+          <p id="login-error" class="login-error">Senha incorreta. Tente novamente.</p>
+        </div>
+        <button class="btn-login" type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div id="dashboard">
+
+    <!-- Cabeçalho -->
+    <header class="admin-header">
+      <div class="admin-header__brand">
+        <span class="admin-header__title">Rafaella &amp; Johnatan</span>
+        <span class="admin-header__sub">Painel de Confirmações</span>
+      </div>
+      <div class="admin-header__actions">
+        <button id="btn-refresh" class="btn-refresh" title="Atualizar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 12a8 8 0 018-8 8 8 0 016.93 4M20 12a8 8 0 01-8 8 8 8 0 01-6.93-4" stroke-linecap="round"/>
+            <path d="M18 4l2 2-2 2M6 20l-2-2 2-2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Atualizar</span>
+        </button>
+        <button id="btn-logout" class="btn-logout">Sair</button>
+      </div>
+    </header>
+
+    <main class="admin-main">
+
+      <!-- Cards de resumo -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-card__label">Confirmações</p>
+          <p class="stat-card__value" id="stat-confirmacoes">—</p>
+          <p class="stat-card__note">pagamentos informados</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-card__label">Total de Pessoas</p>
+          <p class="stat-card__value" id="stat-pessoas">—</p>
+          <p class="stat-card__note">convidados confirmados</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-card__label">Valor Total</p>
+          <p class="stat-card__value" id="stat-valor">—</p>
+          <p class="stat-card__note">a R$ 150 por pessoa</p>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <span class="table-toolbar__label">Lista de confirmados</span>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+          </svg>
+          <input id="search-input" type="search" placeholder="Buscar nome ou telefone…">
+        </div>
+      </div>
+
+      <!-- Tabela -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>Telefone</th>
+              <th>Convidados</th>
+              <th>Valor</th>
+              <th>Data / Hora</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-main">
+            <tr class="loading-row">
+              <td colspan="6"><div class="spinner"></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <footer class="admin-footer">
+        <p class="admin-footer__text">Jantar Pré-Casamento · <em>Rafaella &amp; Johnatan</em></p>
+        <p class="admin-footer__text">Última atualização: <em id="last-update">—</em></p>
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="src/js/admin.js"></script>
+</body>
+</html>

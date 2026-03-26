@@ -1,0 +1,254 @@
+/* ═══ INFO SECTION ═══ */
+.info-section {
+  padding: var(--space-40) 0;
+  position: relative;
+  /* Fundo elegante: gradiente suave com textura dourada sutil */
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 70%),
+    linear-gradient(180deg,
+      rgba(0,0,0,1) 0%,
+      rgba(22,18,10,0.98) 30%,
+      rgba(15,12,6,0.97) 60%,
+      rgba(0,0,0,1) 100%
+    );
+}
+/* Fusão com hero: gradiente de entrada no topo */
+.info-section::before {
+  content:''; position:absolute; top:0; left:0; right:0;
+  height:120px; z-index:1; pointer-events:none;
+  background: linear-gradient(
+    to bottom,
+    rgba(9,9,9,1) 0%,
+    transparent   100%
+  );
+}
+/* Brilho central sutil */
+.info-section::after {
+  content:''; position:absolute; top:0; left:0; right:0; bottom:0;
+  background: radial-gradient(ellipse 60% 40% at 50% 40%, rgba(201,168,76,0.04) 0%, transparent 70%);
+  pointer-events:none; z-index:0;
+}
+.cards-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:var(--space-8);
+  position:relative; z-index:2;
+}
+.info-card {
+  position:relative; text-align:center;
+  padding:var(--space-12) var(--space-8);
+  border:1px solid var(--gold-border);
+  background:var(--surface);
+  transition:border-color 400ms, background 400ms, transform 400ms var(--ease-out);
+  opacity:0; transform:translateY(40px);
+}
+.info-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(201,168,76,0.04) 0%, transparent 60%);
+  opacity:0; transition:opacity 400ms;
+}
+.info-card:hover { border-color:var(--gold); background:var(--surface-hover); transform:translateY(-4px); }
+.info-card:hover::before { opacity:1; }
+.info-card__icon-wrap {
+  width:56px; height:56px; margin:0 auto var(--space-6);
+  border:1px solid var(--gold-border); border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--gold);
+  transition:border-color 400ms, background 400ms;
+}
+.info-card:hover .info-card__icon-wrap { border-color:var(--gold); background:var(--gold-glow); }
+.info-card__icon { width:22px; height:22px; }
+.info-card__title {
+  font-family:var(--font-body); font-weight:400;
+  font-size:var(--text-label); letter-spacing:0.3em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:var(--space-4);
+}
+.info-card__value {
+  font-family:var(--font-display); font-weight:300;
+  font-size:clamp(1.4rem,3vw,2rem); line-height:1.2;
+  color:var(--text-primary); margin-bottom:var(--space-2);
+}
+.info-card__sub {
+  font-size:var(--text-sm); color:var(--text-muted); font-weight:300;
+}
+
+/* ═══ ASSINATURA ═══ */
+.signature-section {
+  padding: 40px var(--padding-x) 80px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: linear-gradient(180deg,
+    var(--black) 0%,
+    rgba(10,8,3,0.99) 50%,
+    var(--black) 100%
+  );
+}
+
+.signature-label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0;      /* GSAP */
+  margin: 0 0 30px;
+}
+
+/* Container do texto */
+.signature-container {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Texto principal — Cormorant Garamond 300 */
+.signature-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(56px, 8vw, 100px);
+  font-style: normal;
+  letter-spacing: 2px;
+  color: #D4AF37;
+  margin: 0;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* Cada letra é um span controlado pelo GSAP */
+.signature-text span {
+  display: inline;
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: opacity, transform;
+}
+
+/* Espaços não se movem — apenas aparecem */
+.signature-text .sig-space {
+  display: inline;
+  opacity: 0;
+  transform: none;
+}
+
+/* Dot pulsante abaixo da assinatura */
+.signature-dot {
+  width: 8px;
+  height: 8px;
+  background: #D4AF37;
+  border-radius: 50%;
+  margin: 24px auto 0;
+  opacity: 0;      /* GSAP */
+  box-shadow: 0 0 6px rgba(212,175,55,0.8), 0 0 14px rgba(212,175,55,0.4);
+  animation: dotBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes dotBlink {
+  0%, 100% { box-shadow: 0 0 4px rgba(212,175,55,0.6), 0 0 10px rgba(212,175,55,0.3); }
+  50%       { box-shadow: 0 0 10px rgba(212,175,55,1),  0 0 24px rgba(212,175,55,0.7); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .signature-section { padding: 30px var(--padding-x) 60px; }
+  .signature-text { font-size: clamp(40px, 10vw, 75px); letter-spacing: 1.5px; }
+}
+@media (max-width: 480px) {
+  .signature-section { padding: 24px var(--padding-x) 50px; }
+  .signature-text { font-size: clamp(34px, 11vw, 50px); letter-spacing: 1px; white-space: normal; text-align: center; }
+  .signature-label { margin-bottom: 20px; }
+}
+
+/* ═══ RESTAURANT SECTION ═══ */
+.restaurant-section {
+  padding: var(--space-40) 0;
+  background: linear-gradient(180deg, var(--black) 0%, var(--black-deep) 100%);
+}
+.restaurant-inner {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:var(--space-20); align-items:center;
+}
+.restaurant-text { max-width:520px; }
+.restaurant-desc {
+  color:var(--text-muted); font-weight:300;
+  line-height:1.9; margin-bottom:var(--space-8);
+}
+.restaurant-details { display:flex; flex-direction:column; gap:var(--space-4); }
+.restaurant-detail-item {
+  display:flex; gap:var(--space-6);
+  padding:var(--space-4) 0;
+  border-bottom:1px solid rgba(201,168,76,0.1);
+}
+.restaurant-detail-label {
+  font-size:var(--text-label); letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--gold); min-width:100px; padding-top:2px;
+}
+.restaurant-detail-value { color:var(--text-muted); font-weight:300; line-height:1.6; }
+.restaurant-maps-link {
+  color:var(--gold); font-weight:300;
+  text-decoration:underline; text-underline-offset:3px;
+  transition:opacity 300ms;
+}
+.restaurant-maps-link:hover { opacity:0.7; }
+.restaurant-visual { position:relative; }
+.restaurant-img-wrap {
+  aspect-ratio:4/5; overflow:hidden;
+  border:1px solid var(--gold-border);
+}
+.restaurant-img {
+  width:100%; height:100%;
+  background-size:cover; background-position:center;
+  background-color:rgba(201,168,76,0.08);
+  transition:transform 600ms var(--ease-out);
+}
+.restaurant-img-wrap:hover .restaurant-img { transform:scale(1.04); }
+.restaurant-ornament {
+  position:absolute; top:-30px; right:-30px;
+  width:120px; height:120px; color:var(--gold); opacity:0.2;
+  pointer-events:none;
+}
+
+/* ═══ CTA FINAL ═══ */
+.cta-section {
+  padding: var(--space-40) 0;
+  text-align:center;
+  background: linear-gradient(180deg, transparent 0%, rgba(201,168,76,0.04) 50%, transparent 100%);
+}
+.cta-inner { max-width:600px; margin:0 auto; }
+.cta-ornament {
+  font-size:0.8rem; color:var(--gold); letter-spacing:0.8em;
+  margin-bottom:var(--space-8); opacity:0.6;
+}
+.cta-title {
+  font-family:var(--font-display); font-weight:300;
+  font-size:var(--text-h2); line-height:1.1;
+  margin-bottom:var(--space-6);
+}
+.cta-title em { font-style:italic; color:var(--gold); }
+.cta-desc {
+  color:var(--text-muted); font-weight:300;
+  margin-bottom:var(--space-6); line-height:1.9;
+}
+/* Valor por pessoa na CTA */
+.cta-value {
+  font-family:var(--font-body); font-size:var(--text-sm);
+  color:var(--text-muted); letter-spacing:0.1em;
+  margin-bottom:var(--space-12);
+}
+.cta-value strong {
+  color:var(--gold); font-weight:400;
+  font-family:var(--font-display); font-size:1rem;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width:768px) {
+  .cards-grid { grid-template-columns:1fr; gap:var(--space-4); }
+  .restaurant-inner { grid-template-columns:1fr; gap:var(--space-12); }
+  .restaurant-visual { order:-1; }
+  .restaurant-img-wrap { aspect-ratio:16/9; }
+}
+@media (max-width:480px) {
+  .info-card { padding:var(--space-8) var(--space-6); }
+}
