@@ -2,19 +2,12 @@
    FRAMES.CSS — GTA-style scrubbing
    ════════════════════════════════════════════ */
 
-/*
-  Abordagem CSS sticky — sem GSAP pin:
-  .frames-section tem altura = 100vh + 2400px (espaço de scroll).
-  .frames-sticky usa position:sticky top:0 — nunca sai do fluxo normal,
-  nunca precisa de spacer calculado via JS. Elimina o gap no release.
-*/
 .frames-section {
-  height: calc(100vh + 2400px);
+  width: 100%;
 }
 
 .frames-sticky {
-  position: sticky;
-  top: 0;
+  position: relative;
   width: 100%;
   height: 100vh;
   overflow: hidden;
@@ -36,12 +29,14 @@
   user-select: none;
 }
 
-/* Canvas de frames — fit gerenciado pelo JS via drawImage */
+/* Foto principal: toda sem corte, centralizada na frente */
 .frame-display {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  object-position: center;
   display: block;
   user-select: none;
   pointer-events: none;
@@ -58,6 +53,6 @@
 }
 
 @media (max-width: 768px) {
-  .frame-bg { display: none; }
-  /* frame-display mobile: cover mode tratado no JS */
+  .frame-bg      { display: none; }
+  .frame-display { object-fit: cover; object-position: center top; }
 }
