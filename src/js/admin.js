@@ -7,7 +7,7 @@ const CONFIG = {
   supabaseUrl:      'https://ydvahupqdmicydwjlggn.supabase.co',
   serviceRoleKey:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdmFodXBxZG1pY3lkd2psZ2duIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDQwMTI5MywiZXhwIjoyMDg5OTc3MjkzfQ.HTpT10wvBi3IShPUcbffdBzChU4rnHFoSUwwms9fZyQ',
   table:            'confirmacoes',
-  adminPassword:    'jantar2025',
+  adminPassword:    'jonierafa2026',
   sessionKey:       'admin_auth_jantar',
 };
 
