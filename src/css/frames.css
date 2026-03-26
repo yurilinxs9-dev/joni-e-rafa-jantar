@@ -3,30 +3,25 @@
    ════════════════════════════════════════════ */
 
 /*
-  IMPORTANTE: .frames-section NÃO deve ter overflow:hidden nem contain:layout.
-  O GSAP ScrollTrigger insere um spacer div como filho desta seção para reservar
-  o espaço de scroll (2400px). Qualquer BFC ou layout containment neste wrapper
-  interfere na medição de posições do GSAP e causa o pulo no release do pin.
+  Abordagem CSS sticky — sem GSAP pin:
+  .frames-section tem altura = 100vh + 2400px (espaço de scroll).
+  .frames-sticky usa position:sticky top:0 — nunca sai do fluxo normal,
+  nunca precisa de spacer calculado via JS. Elimina o gap no release.
 */
 .frames-section {
-  width: 100%;
+  height: calc(100vh + 2400px);
 }
 
 .frames-sticky {
-  position: relative;
+  position: sticky;
+  top: 0;
   width: 100%;
   height: 100vh;
-  overflow: hidden;   /* overflow:hidden aqui (no elemento filho) é seguro */
+  overflow: hidden;
   background: #000;
-  /*
-    SEM contain:layout — o GSAP precisa medir a posição deste elemento
-    no contexto do documento inteiro para calcular o spacer corretamente.
-    contain:layout cria contexto isolado e quebra essa medição.
-  */
 }
 
-/* Fundo: definido UMA VEZ no init — nunca atualizado durante scroll.
-   Evita redecodificar + recompor blur/brightness a cada troca de frame. */
+/* Fundo estático — definido uma vez no init, nunca atualizado durante scroll */
 .frame-bg {
   position: absolute;
   inset: 0;
@@ -35,27 +30,24 @@
   object-fit: cover;
   object-position: center;
   filter: blur(2px) brightness(0.85);
-  transform: scale(1.03); /* evita borda branca do blur */
+  transform: scale(1.03);
   display: block;
   pointer-events: none;
   user-select: none;
 }
 
-/* Foto principal: toda sem corte, centralizada na frente */
+/* Canvas de frames — fit gerenciado pelo JS via drawImage */
 .frame-display {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center;
   display: block;
   user-select: none;
   pointer-events: none;
-  will-change: contents;
 }
 
-/* Overlay de fade: cobre a seção suavemente no final da sequência */
+/* Overlay de fade: entra nos últimos 22% do percurso */
 .frames-fade-out {
   position: absolute;
   inset: 0;
@@ -65,8 +57,7 @@
   z-index: 5;
 }
 
-/* Mobile: imagem portrait cabe na tela — cover preenche tudo sem barras */
 @media (max-width: 768px) {
-  .frame-bg      { display: none; }
-  .frame-display { object-fit: cover; object-position: center top; }
+  .frame-bg { display: none; }
+  /* frame-display mobile: cover mode tratado no JS */
 }

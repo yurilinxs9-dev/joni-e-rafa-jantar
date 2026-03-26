@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ═══════════════════════════════════════
      14. FRAMES — GTA-style scrubbing
-         600vh de scroll · full-screen
+         CSS sticky · canvas rendering
          16 frames trocam com o scroll
      ═══════════════════════════════════════ */
   const framesSection = document.getElementById('frames-section');
@@ -463,13 +463,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (framesSection && frameDisplay) {
 
-    const TOTAL = 16;
+    const TOTAL    = 16;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
     const frameSrcs = Array.from({ length: TOTAL }, (_, i) =>
       `assets/frames/frame_${String(i + 1).padStart(2, '0')}.png`
     );
 
-    // Pré-carrega E decodifica antecipadamente: elimina jank na primeira exibição
+    // Pré-carrega E decodifica todos os frames antecipadamente
     const cache = frameSrcs.map(src => {
       const img = new Image();
       img.src = src;
@@ -477,9 +478,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     cache.forEach(img => { if (img.decode) img.decode().catch(() => {}); });
 
-    // Fundo estático: definido UMA VEZ — nunca atualizado durante o scroll.
-    // Elimina o custo de redecodificar + recompor o filtro blur a cada troca de frame.
+    // Fundo estático — nunca atualizado durante scroll
     if (frameBg) frameBg.src = cache[0].src;
+
+    // ── Canvas setup ──────────────────────────────────────────────────────
+    // frameDisplay é um <canvas> — drawImage() é ~5-10x mais rápido que
+    // img.src swap no mobile: sem ciclo de decode/upload de textura por frame.
+    const canvas = frameDisplay;
+    const ctx    = canvas.getContext('2d', { alpha: true });
+
+    function resizeCanvas() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+
+    function drawToCanvas(img) {
+      if (!img || !img.complete || !img.naturalWidth) return;
+      const cw = canvas.width,  ch = canvas.height;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      ctx.clearRect(0, 0, cw, ch);
+      if (isMobile) {
+        // cover + object-position: center top
+        const scale = Math.max(cw / iw, ch / ih);
+        ctx.drawImage(img, (cw - iw * scale) / 2, 0, iw * scale, ih * scale);
+      } else {
+        // contain — letterbox transparente mostra frame-bg atrás
+        const scale = Math.min(cw / iw, ch / ih);
+        ctx.drawImage(img,
+          (cw - iw * scale) / 2,
+          (ch - ih * scale) / 2,
+          iw * scale,
+          ih * scale
+        );
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      if (current >= 0) drawToCanvas(cache[current]);
+    });
 
     let current = -1;
 
@@ -487,17 +525,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const i = Math.min(Math.max(Math.floor(index), 0), TOTAL - 1);
       if (i === current) return;
       current = i;
-      frameDisplay.src = cache[i].src;
-      // frameBg permanece estático
+      const img = cache[i];
+      if (img.complete && img.naturalWidth) {
+        drawToCanvas(img);
+      } else {
+        img.addEventListener('load', () => { if (current === i) drawToCanvas(img); }, { once: true });
+      }
     }
 
     showFrame(0);
 
-    const proxy = { f: 0 };
+    const proxy       = { f: 0 };
     const frameSticky = framesSection.querySelector('.frames-sticky');
 
-    // Overlay de fade: entra suavemente nos últimos 22% do scroll
-    // evita o corte seco para o preto que causava a sensação de "troca de estado"
     const fadeOverlay = document.createElement('div');
     fadeOverlay.className = 'frames-fade-out';
     frameSticky.appendChild(fadeOverlay);
@@ -508,39 +548,32 @@ document.addEventListener('DOMContentLoaded', () => {
       onUpdate() {
         showFrame(proxy.f);
         const t = proxy.f / (TOTAL - 1);
-        // Fade gradual: começa nos últimos 22% do percurso
-        fadeOverlay.style.opacity = t > 0.78
-          ? ((t - 0.78) / 0.22).toFixed(3)
-          : '0';
+        fadeOverlay.style.opacity = t > 0.78 ? ((t - 0.78) / 0.22).toFixed(3) : '0';
       },
       scrollTrigger: {
-        trigger: frameSticky,
-        pin: true,
-        start: 'top top',
-        end: '+=2400',
-        scrub: 1,
-        pinSpacing: true,
         /*
-          anticipatePin removido: com scrub:1 o scroll já é suave e não
-          precisa de antecipação. anticipatePin introduz um offset temporal
-          que, combinado com o delay do scrub, causava o pulo no release.
+          CSS sticky elimina GSAP pin:true — sem spacer JS, sem cálculo de
+          posição, sem pulo no release. A seção já tem height: calc(100vh + 2400px)
+          e .frames-sticky tem position:sticky top:0.
 
-          invalidateOnRefresh: true garante que resize/orientação
-          recalcula tudo sem precisar de anticipatePin.
+          trigger: framesSection (não frameSticky) — anima enquanto a seção
+          inteira passa pelo viewport.
+          end: 'bottom bottom' = section.bottom chega ao viewport.bottom
+                               = exatamente 2400px de scroll percorridos.
         */
+        trigger: framesSection,
+        start:   'top top',
+        end:     'bottom bottom',
+        scrub:   isMobile ? 0.3 : 1,
         invalidateOnRefresh: true,
       },
     });
   }
 
-  /*
-    ScrollTrigger.refresh() no window 'load':
-    GSAP mede posições no DOMContentLoaded, mas imagens (hero, galeria, frames)
-    carregam depois e empurram conteúdo para baixo. Sem o refresh, o spacer do
-    pin fica com altura errada → pulo ao liberar o pin.
-    Este refresh recalcula todos os triggers após todos os assets estarem prontos.
-  */
-  window.addEventListener('load', () => ScrollTrigger.refresh());
+  // Refresh após todos os assets — double rAF garante layout final estabilizado
+  window.addEventListener('load', () => {
+    requestAnimationFrame(() => requestAnimationFrame(() => ScrollTrigger.refresh()));
+  });
 
 });
 
