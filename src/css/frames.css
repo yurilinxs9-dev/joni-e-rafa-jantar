@@ -4,6 +4,7 @@
 
 .frames-section {
   width: 100%;
+  overflow: hidden;   /* impede que o spacer GSAP cause reflow no layout externo */
 }
 
 .frames-sticky {
@@ -12,9 +13,11 @@
   height: 100vh;
   overflow: hidden;
   background: #000;
+  contain: layout paint; /* isola rendering — camada GPU própria, sem afetar o resto */
 }
 
-/* Fundo: mesma foto escalada nas laterais — sem blur visível, continuação natural */
+/* Fundo: definido UMA VEZ no init — nunca atualizado durante scroll.
+   Evita que o browser redecodifique + recomponha blur a cada troca de frame. */
 .frame-bg {
   position: absolute;
   inset: 0;
@@ -40,6 +43,18 @@
   display: block;
   user-select: none;
   pointer-events: none;
+  will-change: contents; /* avisa ao browser que o src vai trocar */
+}
+
+/* Overlay de fade: cobre a seção suavemente no final da sequência
+   em vez de cortar seco para o preto */
+.frames-fade-out {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
 }
 
 /* Mobile: imagem portrait cabe na tela — cover preenche tudo sem barras */

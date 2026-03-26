@@ -477,34 +477,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     cache.forEach(img => { if (img.decode) img.decode().catch(() => {}); });
 
-    let current = -1; // -1 garante que frame 0 sempre renderiza na primeira chamada
+    // Fundo estático: definido UMA VEZ — nunca atualizado durante o scroll.
+    // Elimina o custo de redecodificar + recompor o filtro blur a cada troca de frame.
+    if (frameBg) frameBg.src = cache[0].src;
+
+    let current = -1;
 
     function showFrame(index) {
       const i = Math.min(Math.max(Math.floor(index), 0), TOTAL - 1);
       if (i === current) return;
       current = i;
       frameDisplay.src = cache[i].src;
-      if (frameBg) frameBg.src = cache[i].src;
+      // frameBg permanece estático
     }
 
     showFrame(0);
 
-    // GSAP anima 0→15 sincronizado com o scroll
     const proxy = { f: 0 };
     const frameSticky = framesSection.querySelector('.frames-sticky');
+
+    // Overlay de fade: entra suavemente nos últimos 22% do scroll
+    // evita o corte seco para o preto que causava a sensação de "troca de estado"
+    const fadeOverlay = document.createElement('div');
+    fadeOverlay.className = 'frames-fade-out';
+    frameSticky.appendChild(fadeOverlay);
 
     gsap.to(proxy, {
       f: TOTAL - 1,
       ease: 'none',
-      onUpdate: () => showFrame(proxy.f),
+      onUpdate() {
+        showFrame(proxy.f);
+        const t = proxy.f / (TOTAL - 1);
+        // Fade gradual: começa nos últimos 22% do percurso
+        fadeOverlay.style.opacity = t > 0.78
+          ? ((t - 0.78) / 0.22).toFixed(3)
+          : '0';
+      },
       scrollTrigger: {
         trigger: frameSticky,
         pin: true,
         start: 'top top',
-        end: '+=2400',            // ~150px por frame — transição confortável, sem rush
-        scrub: 1,                 // catch-up suave, sem gaps em scroll rápido
+        end: '+=2400',
+        scrub: 1,
         pinSpacing: true,
-        invalidateOnRefresh: true, // recalcula ao redimensionar/mudar orientação
+        anticipatePin: 1,          // prepara o pin um frame antes — elimina o "pulo" inicial
+        invalidateOnRefresh: true,
       },
     });
   }
